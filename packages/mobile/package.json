@@ -1,0 +1,26 @@
+{
+  "name": "@repro/mobile",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "index.ts",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "expo start"
+  },
+  "dependencies": {
+    "@repro/common": "workspace:^",
+    "dotenv": "17.2.1",
+    "expo": "55.0.17",
+    "expo-status-bar": "55.0.5",
+    "react": "19.2.2",
+    "react-native": "0.83.6"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.0",
+    "@types/react": "19.2.14",
+    "typescript": "5.9.3"
+  }
+}

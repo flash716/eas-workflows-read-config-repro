@@ -1,0 +1,28 @@
+{
+  "cli": {
+    "version": ">= 2.3.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "base": {
+      "node": "24.13.1",
+      "pnpm": "10.33.0",
+      "resourceClass": "large",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.0"
+      },
+      "android": {
+        "image": "ubuntu-22.04-jdk-17-ndk-r26b"
+      },
+      "channel": "base"
+    },
+    "staging": {
+      "extends": "base",
+      "channel": "staging",
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "staging"
+      }
+    }
+  }
+}

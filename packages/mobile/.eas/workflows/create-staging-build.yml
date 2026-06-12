@@ -1,0 +1,39 @@
+name: Create staging build (repro)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # The "Read app config" step inside this job SUCCEEDS.
+  fingerprint:
+    name: Fingerprint
+    type: fingerprint
+    environment: preview
+
+  # The "Read app config" step inside these build jobs FAILS with:
+  #   Failed to read the app config file with `expo config` command:
+  #   .../node_modules/expo/bin/cli config --json --full --type public exited with non-zero code: 1
+  #   Error reading Expo config at .../packages/mobile/app.config.ts:
+  #   Unexpected token '{'
+  #
+  # The same build profile succeeds when started with `eas build` from a local
+  # machine or via the "Build from GitHub" button on the builds page.
+  build_android:
+    name: Build Android
+    needs: [fingerprint]
+    type: build
+    environment: preview
+    params:
+      platform: android
+      profile: staging
+
+  build_ios:
+    name: Build iOS
+    needs: [fingerprint]
+    type: build
+    environment: preview
+    params:
+      platform: ios
+      profile: staging
