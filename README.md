@@ -32,20 +32,54 @@ started manually with `eas workflow:run`.
   - imports `dotenv`, `node:fs`, `node:path`, and the `ExpoConfig` type
   - reads a JSON file from the sibling workspace package (`../common/lib/version.json`)
   - uses TS-only syntax: type annotations with generics, `as` casts, `as const`, `@ts-expect-error`
+  - registers the **full production plugin list** (expo-notifications, expo-location,
+    expo-camera, @stripe/stripe-react-native, @sentry/react-native, react-native-maps,
+    expo-dev-client, a local `./plugins/withDisableForceDark.js`, etc.) — every plugin is
+    `require()`'d during config evaluation
+- `packages/mobile` carries the **full production dependency tree** (all `expo-*`,
+  `react-native-*`, stream-chat, trpc client, reanimated, etc.) — see exclusions below
 - `packages/common` — sibling workspace package, depended on by mobile via `workspace:^`
+- composite **tsconfig project references** (root → common → mobile), mobile `tsconfig`
+  extends `expo/tsconfig.base`
+- root `metro.config.js`-style monorepo resolver in `packages/mobile/metro.config.js`
+  (`watchFolders`, `nodeModulesPaths`, `disableHierarchicalLookup`)
+- pnpm config at parity: `overrides`, `peerDependencyRules`, `onlyBuiltDependencies`,
+  and `patchedDependencies` (expo-router, react-native-date-picker,
+  stream-chat-react-native-core) under `patches/`
+- `.npmrc` with `node-linker=hoisted`, `strict-peer-dependencies=true`, `auto-install-peers=true`
+- Node 24 (`.nvmrc`, `engines.node >= 24`); `eas.json` pins `"node": "24.13.1"` / `"pnpm": "10.33.0"`
 - `typescript` is a devDependency at the monorepo root **and** in `packages/mobile`
 - The workflow lives at `packages/mobile/.eas/workflows/create-staging-build.yml`
   (the EAS GitHub integration's base directory is `packages/mobile`)
 
 Notes on fidelity:
 
+- **Could not reproduce.** With all of the above — including full dependency and plugin
+  parity — `npx expo config --json --full --type public` (the exact command the failing
+  build step runs) evaluates **successfully on both Node 24.13.1 and Node 20.19.0**, and
+  the EAS Workflow build jobs do **not** fail at "Read app config." In our production app
+  the same step fails with `Unexpected token '{'`.
+- Two production deps are deliberately **excluded** because they can't transplant cleanly
+  and are not part of config evaluation (`app.config.ts` does not import them):
+  - `@fortawesome/pro-*` — private registry, requires an auth token
+  - `@pickleheads/api`, `@pickleheads/db` — would pull the rest of the monorepo
+  - `expo-constants` and `expo-font` were bumped one patch (55.0.15→55.0.16, 55.0.6→55.0.8)
+    to satisfy `@expo/cli` peers on a fresh install (our production lockfile freezes the
+    older pair).
 - Our original `app.config.ts` imported the JSON with an import attribute
   (`import versionJson from "../common/lib/version.json" with { type: "json" }`).
   We replaced it with `fs.readFileSync` (see comment in `app.config.ts`) at support's
   suggestion — the workflow builds fail identically either way.
 - Our production workflow uses `environment: staging` and gates builds behind
-  `get-build` jobs; this repro uses `environment: preview` and unconditional builds
-  to stay minimal. The failure is in the build jobs' "Read app config" step either way.
+  `get-build` jobs; this repro uses `environment: preview` and unconditional builds.
+
+Key open question for the Workflows team: in our production workflow the **`fingerprint`
+job's "Read app config" step succeeds while the `build` jobs' identical step fails**, in the
+same run on the same commit. A per-job difference can't come from repo code — it points to
+the runtime each job's config-read harness uses. **What Node version and flags does the
+build job's "Read app config" step run under, versus the fingerprint job?** We suspect the
+build job evaluates the config under a Node where native TypeScript type-stripping is
+expected but not enabled (e.g. ~22.6–23.5), diverging from the `24.13.1` pinned in `eas.json`.
 
 ## Steps to reproduce
 
