@@ -1,0 +1,36 @@
+diff --git a/build/global-state/routing.js b/build/global-state/routing.js
+index 987e254d279b050bff3fee8611da2a430820f12d..349ad417fab1ff697a3de0f82ea44f374f3dccb8 100644
+--- a/build/global-state/routing.js
++++ b/build/global-state/routing.js
+@@ -349,13 +349,27 @@ lookThroughAllTabs = false) {
+         })();
+         const childState = actionStateRoute.state;
+         const nextNavigationState = stateRoute.state;
+-        const dynamicName = (0, matchers_1.matchDynamicName)(actionStateRoute.name);
++        // PICKLEHEADS PATCH (PH-4440): route names can span multiple URL segments
++        // when intermediate folders have no _layout (e.g.
++        // `sessions/[sessionSlug]/[instanceSlug]`). The original code only
++        // compared params when the WHOLE name was a single dynamic segment
++        // (`[param]`), so navigating to the same route with different dynamic
++        // params was not detected as a divergence. The action then targeted a
++        // navigator nested inside the existing screen, leaving the screen's own
++        // params (and any sibling tab screens) stale. Compare the params of
++        // every dynamic segment in the name instead.
++        const dynamicSegmentsDiverge = actionStateRoute.name
++            .split('/')
++            .some((segment) => {
++            const dynamicName = (0, matchers_1.matchDynamicName)(segment);
++            return (dynamicName != null &&
++                // @ts-expect-error: TODO(@kitten): This isn't properly typed, so the index access fails
++                actionStateRoute.params?.[dynamicName.name] !== stateRoute.params?.[dynamicName.name]);
++        });
+         const didActionAndCurrentStateDiverge = actionStateRoute.name !== stateRoute.name ||
+             !childState ||
+             !nextNavigationState ||
+-            (dynamicName &&
+-                // @ts-expect-error: TODO(@kitten): This isn't properly typed, so the index access fails
+-                actionStateRoute.params?.[dynamicName.name] !== stateRoute.params?.[dynamicName.name]);
++            dynamicSegmentsDiverge;
+         if (didActionAndCurrentStateDiverge) {
+             // If we are looking through all tabs, we need to add new tab id if this is the last route
+             // Otherwise we wouldn't be able to change the tab

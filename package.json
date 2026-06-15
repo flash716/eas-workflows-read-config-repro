@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "private": true,
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -11,11 +11,40 @@
     "typescript": "5.9.3"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "@parcel/watcher",
+      "@sentry-internal/node-cpu-profiler",
+      "@sentry/cli",
+      "bufferutil",
+      "esbuild",
+      "sharp",
+      "unrs-resolver",
+      "utf-8-validate"
+    ],
     "overrides": {
+      "@tanstack/react-query": "5.100.14",
       "react": "19.2.2",
       "react-dom": "19.2.2",
+      "react-test-renderer": "19.2.2",
       "@types/react": "19.2.14",
       "@types/react-dom": "19.2.3"
+    },
+    "patchedDependencies": {
+      "react-native-date-picker@5.0.12": "patches/react-native-date-picker@5.0.12.patch",
+      "expo-router@55.0.13": "patches/expo-router@55.0.13.patch",
+      "stream-chat-react-native-core@9.1.2": "patches/stream-chat-react-native-core@9.1.2.patch"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": ">=18",
+        "metro": "~0.83.0",
+        "typescript": ">=5.9.0",
+        "utf-8-validate": ">=5"
+      },
+      "ignoreMissing": [
+        "@babel/*"
+      ]
     }
   }
 }

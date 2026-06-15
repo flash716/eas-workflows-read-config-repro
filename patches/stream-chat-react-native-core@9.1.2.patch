@@ -1,0 +1,64 @@
+diff --git a/src/components/AttachmentPicker/AttachmentPicker.tsx b/src/components/AttachmentPicker/AttachmentPicker.tsx
+index 19022bbc90df40367feecc4b73756e31e82b8d99..e57290c3cb3aa85e10d03ded667b1f19b9c14163 100644
+--- a/src/components/AttachmentPicker/AttachmentPicker.tsx
++++ b/src/components/AttachmentPicker/AttachmentPicker.tsx
+@@ -32,6 +32,10 @@ const SPRING_CONFIG = {
+   duration: 200,
+ };
+ 
++// PH-4891: applied to the bottom sheet's background while the picker is closed
++// so a mis-positioned ("ghost") closed sheet has nothing visible to paint.
++const PH_4891_TRANSPARENT_BACKGROUND = { backgroundColor: 'transparent' };
++
+ export const AttachmentPicker = () => {
+   const {
+     closePicker,
+@@ -148,10 +152,20 @@ export const AttachmentPicker = () => {
+     },
+   );
+ 
++  // PH-4891: Stream's <AttachmentPicker> always renders its content, relying on
++  // the bottom sheet to position it off-screen when closed. After a
++  // keyboard/background reflow the closed sheet (index === -1) gets left
++  // painted in place — the "ghost view" bug (GetStream/stream-chat-react-native
++  // #3195) — so the photo grid stays visible after dismissing the keyboard.
++  // When closed, render nothing and keep the sheet background transparent so
++  // there is nothing to ghost. The <BottomSheet> itself stays mounted so the
++  // ref-based openPicker()/closePicker() keep working.
++  const isPickerClosed = currentIndex === -1;
++
+   return (
+     <BottomSheet
+       android_keyboardInputMode='adjustResize'
+-      backgroundStyle={backgroundStyle}
++      backgroundStyle={isPickerClosed ? PH_4891_TRANSPARENT_BACKGROUND : backgroundStyle}
+       enablePanDownToClose={false}
+       enableContentPanningGesture={false}
+       enableDynamicSizing={false}
+@@ -164,14 +178,18 @@ export const AttachmentPicker = () => {
+       snapPoints={snapPoints}
+       animationConfigs={animationConfigs}
+     >
+-      <View onLayout={onAttachmentPickerSelectionBarLayout}>
+-        <AttachmentPickerSelectionBar />
+-      </View>
+-      {!disableAttachmentPicker ? (
+-        <AttachmentPickerContent
+-          height={attachmentPickerBottomSheetHeight - (selectionBarRef?.current ?? 0)}
+-        />
+-      ) : null}
++      {isPickerClosed ? null : (
++        <>
++          <View onLayout={onAttachmentPickerSelectionBarLayout}>
++            <AttachmentPickerSelectionBar />
++          </View>
++          {!disableAttachmentPicker ? (
++            <AttachmentPickerContent
++              height={attachmentPickerBottomSheetHeight - (selectionBarRef?.current ?? 0)}
++            />
++          ) : null}
++        </>
++      )}
+     </BottomSheet>
+   );
+ };

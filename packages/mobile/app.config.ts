@@ -53,11 +53,125 @@ const config: ExpoConfig = {
   // @ts-expect-error - field removed from types; still honored at runtime
   newArchEnabled: true,
 
-  // Local config plugin loaded via require() during config evaluation. This is
-  // the one local file Expo has to resolve and execute while reading the
-  // config, so we include it to test whether it's involved in the workflow
-  // build failure.
-  plugins: ["./plugins/withDisableForceDark.js"],
+  plugins: [
+    "expo-secure-store",
+    "expo-localization",
+    "expo-router",
+    "expo-audio",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/android-notification.png",
+        color: "#ea6645",
+        defaultChannel: "default",
+      },
+    ],
+    [
+      "expo-location",
+      {
+        locationAlwaysAndWhenInUsePermission:
+          "$(PRODUCT_NAME) wants to show pickleball courts, games, and groups near your location.",
+        locationAlwaysPermission:
+          "$(PRODUCT_NAME) wants to show pickleball courts, games, and groups near your location.",
+        locationWhenInUsePermission:
+          "$(PRODUCT_NAME) wants to show pickleball courts, games, and groups near your location.",
+      },
+    ],
+    [
+      "expo-camera",
+      {
+        cameraPermission:
+          "$(PRODUCT_NAME) wants to take photos and videos to use in your profile, courts, groups, or in chat.",
+        microphonePermission:
+          "$(PRODUCT_NAME) wants to take photos and videos to use in your profile, courts, groups, or in chat.",
+        recordAudioAndroid: true,
+      },
+    ],
+    [
+      "expo-screen-orientation",
+      {
+        initialOrientation: "DEFAULT",
+      },
+    ],
+    [
+      "expo-image-picker",
+      {
+        photosPermission:
+          "$(PRODUCT_NAME) wants to add your photos to your profile, courts, groups and in chat.",
+        cameraPermission:
+          "$(PRODUCT_NAME) wants to take photos and videos to use in your profile, courts, groups, or in chat.",
+        microphonePermission:
+          "$(PRODUCT_NAME) would like to record videos with sound which can be shared within chat.",
+      },
+    ],
+    [
+      "expo-video",
+      {
+        supportsBackgroundPlayback: true,
+        supportsPictureInPicture: true,
+      },
+    ],
+    [
+      "expo-contacts",
+      {
+        contactsPermission:
+          "$(PRODUCT_NAME) wants to access your contacts so you can easily invite people you know to a pickleball group or session.",
+      },
+    ],
+    [
+      "expo-font",
+      {
+        fonts: [],
+      },
+    ],
+    [
+      "@stripe/stripe-react-native",
+      {
+        merchantIdentifier: "merchant.com.pickleheads.mobile",
+        enableGooglePay: true,
+      },
+    ],
+    [
+      "@sentry/react-native",
+      {
+        organization: "dinktech",
+        project: "pickleheads",
+      },
+    ],
+    "@react-native-community/datetimepicker",
+    "expo-web-browser",
+    "./plugins/withDisableForceDark.js",
+    [
+      "expo-build-properties",
+      {
+        android: {
+          compileSdkVersion: 36,
+          targetSdkVersion: 36,
+          buildToolsVersion: "36.0.0",
+        },
+      },
+    ],
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: "#2d93ad",
+        imageWidth: 200,
+      },
+    ],
+    [
+      "react-native-maps",
+      {
+        iosGoogleMapsApiKey: "PLACEHOLDER",
+        androidGoogleMapsApiKey: "PLACEHOLDER",
+      },
+    ],
+    [
+      "expo-dev-client",
+      {
+        launchMode: "most-recent",
+      },
+    ],
+  ],
 
   extra: {
     eas: {
