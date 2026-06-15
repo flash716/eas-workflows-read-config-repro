@@ -6,7 +6,7 @@ const {
   AndroidConfig,
   createRunOncePlugin,
   withAndroidStyles,
-} = require("@expo/config-plugins");
+} = require("@expo/config-plugins")
 /* eslint-enable @typescript-eslint/no-require-imports */
 
 /**
@@ -27,13 +27,13 @@ const withDisableForceDark = (config) => {
         name: "android:forceDarkAllowed",
         value: "false",
       },
-    );
-    return config;
-  });
-};
+    )
+    return config
+  })
+}
 
 module.exports = createRunOncePlugin(
   withDisableForceDark,
   "with-disable-force-dark",
   "1.0.0",
-);
+)

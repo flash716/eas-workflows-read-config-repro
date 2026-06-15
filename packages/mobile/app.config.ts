@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
-import type { ExpoConfig } from "expo/config";
-import fs from "node:fs";
-import path from "node:path";
+import dotenv from "dotenv"
+import type { ExpoConfig } from "expo/config"
+import fs from "node:fs"
+import path from "node:path"
 
 // Read MOBILE_APP_VERSION from a JSON single source of truth that lives in a
 // sibling workspace package. Originally this was an import attribute, which
@@ -12,24 +12,24 @@ const versionJson = JSON.parse(
     path.resolve(__dirname, "../common/lib/version.json"),
     "utf8",
   ),
-) as { MOBILE_APP_VERSION: string };
-const MOBILE_APP_VERSION = versionJson.MOBILE_APP_VERSION;
+) as { MOBILE_APP_VERSION: string }
+const MOBILE_APP_VERSION = versionJson.MOBILE_APP_VERSION
 
-dotenv.config({ quiet: true });
+dotenv.config({ quiet: true })
 
 // We include config for several backend environments in the app so it can
 // switch between them without a rebuild. Env vars come from a .env file
 // locally and from EAS environment variables on builds.
-const defaultAppEnv = process.env.APP_ENV ?? "development";
-const phConfig: Record<string, Record<string, string>> = {};
+const defaultAppEnv = process.env.APP_ENV ?? "development"
+const phConfig: Record<string, Record<string, string>> = {}
 
 const environments =
   defaultAppEnv === "development"
     ? ["development", "qa", "staging"]
-    : ["qa", "staging", "production"];
+    : ["qa", "staging", "production"]
 
 environments.forEach((env) => {
-  const prefix = env.toUpperCase() + "_";
+  const prefix = env.toUpperCase() + "_"
 
   phConfig[env] = {
     // The real config reads ~10 keys per environment this way. Placeholder
@@ -37,8 +37,8 @@ environments.forEach((env) => {
     exampleApiKey: String(
       process.env[`${prefix}EXAMPLE_API_KEY`] ?? "placeholder",
     ),
-  };
-});
+  }
+})
 
 const config: ExpoConfig = {
   name: "EAS Workflows Repro",
@@ -212,6 +212,6 @@ const config: ExpoConfig = {
   runtimeVersion: {
     policy: "appVersion",
   },
-};
+}
 
-export default config;
+export default config
