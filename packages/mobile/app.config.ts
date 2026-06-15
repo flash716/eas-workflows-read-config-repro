@@ -53,6 +53,12 @@ const config: ExpoConfig = {
   // @ts-expect-error - field removed from types; still honored at runtime
   newArchEnabled: true,
 
+  // Local config plugin loaded via require() during config evaluation. This is
+  // the one local file Expo has to resolve and execute while reading the
+  // config, so we include it to test whether it's involved in the workflow
+  // build failure.
+  plugins: ["./plugins/withDisableForceDark.js"],
+
   extra: {
     eas: {
       projectId: "3cc2c900-4084-4c67-a806-67af9c3279d0",
