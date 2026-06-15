@@ -42,7 +42,8 @@ environments.forEach((env) => {
 
 const config: ExpoConfig = {
   name: "EAS Workflows Repro",
-  slug: "eas-workflows-repro",
+  slug: "expo-workflow-error-repro",
+  owner: "pickleheadscom",
   version: MOBILE_APP_VERSION,
   orientation: "portrait",
   userInterfaceStyle: "light",
@@ -54,7 +55,7 @@ const config: ExpoConfig = {
 
   extra: {
     eas: {
-      projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
+      projectId: "3cc2c900-4084-4c67-a806-67af9c3279d0",
     },
     gitCommit: process.env.EAS_BUILD_GIT_COMMIT_HASH ?? "undefined",
     defaultAppEnv,
@@ -85,7 +86,7 @@ const config: ExpoConfig = {
   },
 
   updates: {
-    url: "https://u.expo.dev/REPLACE_WITH_YOUR_PROJECT_ID",
+    url: "https://u.expo.dev/3cc2c900-4084-4c67-a806-67af9c3279d0",
   },
 
   runtimeVersion: {
